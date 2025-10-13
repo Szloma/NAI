@@ -1,11 +1,20 @@
+WIDTH = 4
+HEIGHT = 4
+TOKENS_TO_WIN = 3
 
-WIDTH = 7
-HEIGHT = 6
-class Connect4:
+from easyAI import TwoPlayerGame, Human_Player, AI_Player, Negamax
+
+
+class Connect4(TwoPlayerGame):
+    """ In each turn, a player drops a token into the chosen column,
+     where it occupies the lowest available slot. The first player to align
+    TOKENS_TO_WIN of their tokens horizontally, vertically, or diagonally wins the game."""
+
     def __init__(self, players=None):
-        self.players=players
-        self.board= self.generate_board()
+        self.players = players
+        self.board = self.generate_board()
         self.current_player = 1
+
     def generate_board(self):
         board = ""
         for row in range(WIDTH):
@@ -14,15 +23,15 @@ class Connect4:
         return board
 
     def show(self):
-        for i in range(0,WIDTH):
-            print("_",end=" ")
+        for i in range(0, WIDTH):
+            print("_", end=" ")
         print("\n")
         for i in range(len(self.board)):
             print(self.board[i], end=" ")
-            if (i + 1) % WIDTH  == 0:
+            if (i + 1) % WIDTH == 0:
                 print()
-        for i in range(0,WIDTH):
-            print("_",end=" ")
+        for i in range(0, WIDTH):
+            print("_", end=" ")
 
     def possible_moves(self):
         moves = []
@@ -31,62 +40,69 @@ class Connect4:
                 moves.append(row)
         return moves
 
-    def make_move(self,index, player):
+    def make_move(self, index):
 
         next_position = index
         stable_position = index
-        for i in range(0,HEIGHT):
-            if self.board[next_position]=="0":
-                stable_position=next_position
-                next_position+=WIDTH
+        for i in range(0, HEIGHT):
+            if self.board[next_position] == "0":
+                stable_position = next_position
+                next_position += WIDTH
 
-
-        self.board = self.board[:stable_position] + str(player) + self.board[stable_position + 1:]
-
-    def win(self):
-        ##
-        lengths = {"1":{},"2":{}}
-
-        start_indexes=[]
-        for i in range(WIDTH):
-            start_indexes.append(i)
-            for key in lengths.keys():
-                lengths[key][i]=0
-
-        ##Vertical check
-        for i in start_indexes:
-            next_index=i
-            for n in range(HEIGHT):
-                next_index+=WIDTH
-                if next_index >= len(self.board):
-                    break
-                if self.board[next_index]!="0":
-                    lengths[self.board[next_index]][i]+=1
-                    print("match at ", n, " ",i)
-        ##TODO diagonal check
-
-        ##Determine if winner
-        for key in lengths.keys():
-            value = lengths[key]
-            for n in value.keys():
-                if n==4:
-                    return key
-        return 0
+        if self.current_player == 1:
+            token_mark = 1
+        else:
+            token_mark = 2
+        self.board = self.board[:stable_position] + str(token_mark) + self.board[stable_position + 1:]
 
     def scoring(self):
         ##AI - 2 player
-        if self.win()==2:
+        if int(self.win()) == 2:
             return 100
         return 0
 
-if __name__ == '__main__':
-    app = Connect4()
-    print(app.possible_moves())
-    app.show()
-    app.make_move(1,1)
-    app.make_move(1, 1)
-    app.make_move(1, 1)
-    app.make_move(1, 2)
-    app.show()
-    print(app.win())
+    def win(self):
 
+        # row * width + col to check 1D as 2D (row, col)
+        def idx(row, col):
+            return row * WIDTH + col
+
+        for player in (1, 2):
+            token_mark = str(player)
+
+            # horizontal
+            for row in range(HEIGHT):
+                for col in range(WIDTH - (TOKENS_TO_WIN - 1)):
+                    if all(self.board[idx(row, col + i)] == token_mark for i in range(TOKENS_TO_WIN)):
+                        return token_mark
+
+            # vertical
+            for col in range(WIDTH):
+                for row in range(HEIGHT - (TOKENS_TO_WIN - 1)):
+                    if all(self.board[idx(row + i, col)] == token_mark for i in range(TOKENS_TO_WIN)):
+                        return token_mark
+
+            # down‑right
+            for row in range(HEIGHT - (TOKENS_TO_WIN - 1)):
+                for col in range(WIDTH - (TOKENS_TO_WIN - 1)):
+                    if all(self.board[idx(row + i, col + i)] == token_mark for i in range(TOKENS_TO_WIN)):
+                        return token_mark
+
+            # up‑right
+            for row in range((TOKENS_TO_WIN - 1), HEIGHT):
+                for col in range(WIDTH - (TOKENS_TO_WIN - 1)):
+                    if all(self.board[idx(row - i, col + i)] == token_mark for i in range(TOKENS_TO_WIN)):
+                        return token_mark
+
+        return 0
+
+    def is_over(self):
+        if int(self.win()) == 2 or int(self.win()) == 1: return True
+        if self.possible_moves() == []: return True
+        return False
+
+
+if __name__ == '__main__':
+    ai = Negamax(5)
+    game = Connect4([Human_Player(), AI_Player(ai)])
+    history = game.play()
