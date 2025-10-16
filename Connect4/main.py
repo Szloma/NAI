@@ -56,10 +56,19 @@ class Connect4(TwoPlayerGame):
         self.board = self.board[:stable_position] + str(token_mark) + self.board[stable_position + 1:]
 
     def scoring(self):
-        ##AI - 2 player
-        if int(self.win()) == 2:
+        ##AI- 2 player
+        winner = int(self.win())
+        # if int(self.win()) == 2:
+        #     return 100
+        # else: return 0
+        print("WINNER:", winner)
+        print("possible moves:", self.possible_moves())
+        if winner == 2:
             return 100
-        return 0
+        elif winner == 1:
+            return -10000
+        else:
+            return -10
 
     def win(self):
 
@@ -103,6 +112,6 @@ class Connect4(TwoPlayerGame):
 
 
 if __name__ == '__main__':
-    ai = Negamax(5)
-    game = Connect4([Human_Player(), AI_Player(ai)])
+    ai = Negamax(2)
+    game = Connect4([ Human_Player(), AI_Player(ai)])
     history = game.play()
