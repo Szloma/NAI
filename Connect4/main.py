@@ -1,5 +1,5 @@
 WIDTH = 4
-HEIGHT = 4
+HEIGHT = WIDTH
 TOKENS_TO_WIN = 3
 
 from easyAI import TwoPlayerGame, Human_Player, AI_Player, Negamax
@@ -41,7 +41,6 @@ class Connect4(TwoPlayerGame):
         return moves
 
     def make_move(self, index):
-
         next_position = index
         stable_position = index
         for i in range(0, HEIGHT):
@@ -61,14 +60,14 @@ class Connect4(TwoPlayerGame):
         # if int(self.win()) == 2:
         #     return 100
         # else: return 0
-        print("WINNER:", winner)
-        print("possible moves:", self.possible_moves())
+        # print("WINNER:", winner)
+        # print("possible moves:", self.possible_moves())
         if winner == 2:
-            return 100
+            return 1
         elif winner == 1:
             return -10000
         else:
-            return -10
+            return -10000
 
     def win(self):
 
@@ -112,6 +111,6 @@ class Connect4(TwoPlayerGame):
 
 
 if __name__ == '__main__':
-    ai = Negamax(2)
-    game = Connect4([ Human_Player(), AI_Player(ai)])
+    ai = Negamax(13)
+    game = Connect4([ AI_Player(ai), Human_Player()])
     history = game.play()
