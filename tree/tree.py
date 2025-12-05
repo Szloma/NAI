@@ -7,10 +7,16 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
+from sklearn import tree
 
 
 '''
 
+Dawid Litwiński, Łukasz Kapkowski
+
+classifiers: decision tree, svm to classify data for datasets wine.csv, and ads.csv
+
+example of running with parameters:
 python tree.py gini 5 rbf 1.0 32 150000
 python tree.py gini 15 rbf 0.3 32 150000
 python tree.py entropy 5 linear 1.0 32 150000
@@ -53,9 +59,9 @@ def main():
     X_test_scaled = scaler.transform(X_test)
 
     criterion = 'gini'
-    max_depth = None
+    max_depth = 5
     kernel = 'rbf'
-    regularisation_c = 1.0
+    regularisation_c = 1.04
 
 
     parser = argparse.ArgumentParser(description="series of strings.")
@@ -80,6 +86,13 @@ def main():
         evaluate(decision_tree, X_train, X_test, y_train, y_test, 'Decision Tree')
         evaluate(svm_classifier, X_train_scaled, X_test_scaled, y_train, y_test, 'SVM')
 
+        feature_names = X.columns.tolist()
+        class_names = [str(c) for c in sorted(y.unique())]
+
+        plot_decision_tree(decision_tree,
+                           feature_names=feature_names,
+                           class_names=class_names)
+
 
     df = pd.read_csv('ads.csv', sep=',', quotechar='"')
     X = df.drop(columns='Purchased')
@@ -99,8 +112,10 @@ def main():
     evaluate(svm_classifier, X_train_scaled, X_test_scaled, y_train, y_test, 'SVM 2nd')
     if args.strings:
         X_new = pd.DataFrame([[feature1, feature2]], columns=["Age", "EstimatedSalary"])
-        print(decision_tree.predict(X_new))
-        print(svm_classifier.predict([[feature1,feature2]]))
+        print("decission tree for given input= ",decision_tree.predict(X_new))
+        print("svm for given input= ",svm_classifier.predict([[feature1,feature2]]))
+
+
 
 def evaluate(model, X_tr, X_te, y_tr, y_te, name):
 
@@ -139,6 +154,20 @@ def evaluate(model, X_tr, X_te, y_tr, y_te, name):
     plt.tight_layout()
     plt.show()
 
+
+def plot_decision_tree(model, feature_names, class_names):
+    plt.figure(figsize=(140, 25))
+    tree.plot_tree(
+        model,
+        feature_names=feature_names,
+        class_names=class_names,
+        filled=True,  # colour class purity
+        impurity=True,
+        rounded=True,
+        fontsize=12
+    )
+    plt.title("Decision Tree")
+    plt.show()
 
 if __name__ == '__main__':
     main()
