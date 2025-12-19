@@ -1,10 +1,15 @@
 """
+Dawid Litwiński, Łukasz Kapkowski
+
+neural network classification for wine, animals CIFAR10, mnist-fashion
+ and mnist (0-9) - mnist is compared with 2 different sizes, small network with accuracy ~87%, bigger ~95%
 
 """
 
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+# import tensorflow_datasets as tfds
 import pandas as pd
 import numpy as np
 from keras.datasets import fashion_mnist
@@ -137,9 +142,57 @@ def fashion():
 
     model_fashion.fit(x_train, y_train, epochs=10, validation_split=0.2)
 
+def mnist():
+    print("MNIST")
+
+    (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+    model = keras.Sequential([
+        layers.Flatten(input_shape=(28,28)),
+        layers.Dense(128, activation='relu'),
+        layers.Dense(64, activation='relu'),
+        layers.Dense(10, activation='softmax')
+    ])
+
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    model.fit(x_train, y_train, epochs=5, validation_split=0.2)
+
+    test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
+    print(f"\n MINST 128-64-10 Test accuracy: {test_acc:.4f}")
+
+def mnist2():
+    print("MNIST")
+
+    (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+    model = keras.Sequential([
+        layers.Flatten(input_shape=(28,28)),
+        layers.Dense(32, activation='relu'),
+        layers.Dense(16, activation='relu'),
+        layers.Dense(10, activation='softmax')
+    ])
+
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    model.fit(x_train, y_train, epochs=5, validation_split=0.2)
+
+    test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
+    print(f"\n MINST 64-32-10 Test accuracy: {test_acc:.4f}")
+
+
 def main():
    # wine()
-    animals()
-    #fashion()
+   #  animals()
+   #  fashion()
+   # mnist2()
 if __name__ == "__main__":
     main()
