@@ -1,7 +1,16 @@
 import cv2
 import numpy as np
 
-# pip install opencv-python
+""" 
+pip install opencv-python
+
+Dawid Litwiński, Łukasz Kapkowski
+
+prototyp maszyny do gry w "Baba Jaga patrzy" (wybrać 2 z 4 funkcjonalności)
+- Narysować celownik na twarzy celu; - zielony celownik
+- Wycelować w cele które się ruszają? - czerwony celownik kiedy cel się szybko rusza
+"""
+
 
 # Load the Haar cascade file
 # face_cascade = cv2.CascadeClassifier(
@@ -17,7 +26,7 @@ if face_cascade.empty():
 
 # Initialize the video capture object
 cap = cv2.VideoCapture(0)
-
+1
 # Define the scaling factor
 # scaling_factor = 0.5
 prev_x, prev_y, prev_w, prev_h = 0, 0, 0, 0
